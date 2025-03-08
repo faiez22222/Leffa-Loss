@@ -31,3 +31,4 @@ torchmetrics
 torchvision
 tqdm
 transformers
+triton
