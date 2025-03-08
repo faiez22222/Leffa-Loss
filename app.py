@@ -18,13 +18,14 @@ snapshot_download(
     local_dir="./ckpts",
     allow_patterns=[
         "stable-diffusion-inpainting/*",
+        "virtual_tryon.pth",
         "densepose/*",
         "schp/*",
         "humanparsing/*",
         "openpose/*",
         "examples/*",
     ],  # Include only these patterns
-    ignore_patterns=["pose_transfer.pth","virtual_tryon_dc.pth", "virtual_tryon.pth",],  # Explicitly exclude this
+    ignore_patterns=["pose_transfer.pth","virtual_tryon_dc.pth" ],  # Explicitly exclude this
 )
 
 class LeffaPredictor(object):
