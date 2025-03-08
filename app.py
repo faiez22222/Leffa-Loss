@@ -168,16 +168,16 @@ class LeffaPredictor(object):
             preprocess_garment,  # Pass through the new flag.
         )
 
-    def leffa_predict_pt(self, src_image_path, ref_image_path, ref_acceleration, step, scale, seed):
-        return self.leffa_predict(
-            src_image_path,
-            ref_image_path,
-            "pose_transfer",
-            ref_acceleration,
-            step,
-            scale,
-            seed,
-        )
+    # def leffa_predict_pt(self, src_image_path, ref_image_path, ref_acceleration, step, scale, seed):
+    #     return self.leffa_predict(
+    #         src_image_path,
+    #         ref_image_path,
+    #         "pose_transfer",
+    #         ref_acceleration,
+    #         step,
+    #         scale,
+    #         seed,
+    #     )
 
 
 if __name__ == "__main__":
@@ -305,73 +305,73 @@ if __name__ == "__main__":
                     outputs=[vt_gen_image, vt_mask, vt_densepose]
                 )
 
-        with gr.Tab("Control Pose (Pose Transfer)"):
-            with gr.Row():
-                with gr.Column():
-                    gr.Markdown("#### Person Image")
-                    pt_ref_image = gr.Image(
-                        sources=["upload"],
-                        type="filepath",
-                        label="Person Image",
-                        width=512,
-                        height=512,
-                    )
-                    gr.Examples(
-                        inputs=pt_ref_image,
-                        examples_per_page=10,
-                        examples=person1_images,
-                    )
-                with gr.Column():
-                    gr.Markdown("#### Target Pose Person Image")
-                    pt_src_image = gr.Image(
-                        sources=["upload"],
-                        type="filepath",
-                        label="Target Pose Person Image",
-                        width=512,
-                        height=512,
-                    )
-                    gr.Examples(
-                        inputs=pt_src_image,
-                        examples_per_page=10,
-                        examples=person2_images,
-                    )
-                with gr.Column():
-                    gr.Markdown("#### Generated Image")
-                    pt_gen_image = gr.Image(
-                        label="Generated Image",
-                        width=512,
-                        height=512,
-                    )
-                    with gr.Row():
-                        pose_transfer_gen_button = gr.Button("Generate")
-                    with gr.Accordion("Advanced Options", open=False):
-                        pt_ref_acceleration = gr.Radio(
-                            label="Accelerate Reference UNet",
-                            choices=[("True", True), ("False", False)],
-                            value=False,
-                        )
-                        pt_step = gr.Number(
-                            label="Inference Steps", minimum=30, maximum=100, step=1, value=30)
-                        pt_scale = gr.Number(
-                            label="Guidance Scale", minimum=0.1, maximum=5.0, step=0.1, value=2.5)
-                        pt_seed = gr.Number(
-                            label="Random Seed", minimum=-1, maximum=2147483647, step=1, value=42)
-                    with gr.Accordion("Debug", open=False):
-                        pt_mask = gr.Image(
-                            label="Generated Mask",
-                            width=256,
-                            height=256,
-                        )
-                        pt_densepose = gr.Image(
-                            label="Generated DensePose",
-                            width=256,
-                            height=256,
-                        )
-                pose_transfer_gen_button.click(
-                    fn=leffa_predictor.leffa_predict_pt,
-                    inputs=[pt_src_image, pt_ref_image, pt_ref_acceleration, pt_step, pt_scale, pt_seed],
-                    outputs=[pt_gen_image, pt_mask, pt_densepose]
-                )
+    # with gr.Tab("Control Pose (Pose Transfer)"):
+    #         with gr.Row():
+    #             with gr.Column():
+    #                 gr.Markdown("#### Person Image")
+    #                 pt_ref_image = gr.Image(
+    #                     sources=["upload"],
+    #                     type="filepath",
+    #                     label="Person Image",
+    #                     width=512,
+    #                     height=512,
+    #                 )
+    #                 gr.Examples(
+    #                     inputs=pt_ref_image,
+    #                     examples_per_page=10,
+    #                     examples=person1_images,
+    #                 )
+    #             with gr.Column():
+    #                 gr.Markdown("#### Target Pose Person Image")
+    #                 pt_src_image = gr.Image(
+    #                     sources=["upload"],
+    #                     type="filepath",
+    #                     label="Target Pose Person Image",
+    #                     width=512,
+    #                     height=512,
+    #                 )
+    #                 gr.Examples(
+    #                     inputs=pt_src_image,
+    #                     examples_per_page=10,
+    #                     examples=person2_images,
+    #                 )
+    #             with gr.Column():
+    #                 gr.Markdown("#### Generated Image")
+    #                 pt_gen_image = gr.Image(
+    #                     label="Generated Image",
+    #                     width=512,
+    #                     height=512,
+    #                 )
+    #                 with gr.Row():
+    #                     pose_transfer_gen_button = gr.Button("Generate")
+    #                 with gr.Accordion("Advanced Options", open=False):
+    #                     pt_ref_acceleration = gr.Radio(
+    #                         label="Accelerate Reference UNet",
+    #                         choices=[("True", True), ("False", False)],
+    #                         value=False,
+    #                     )
+    #                     pt_step = gr.Number(
+    #                         label="Inference Steps", minimum=30, maximum=100, step=1, value=30)
+    #                     pt_scale = gr.Number(
+    #                         label="Guidance Scale", minimum=0.1, maximum=5.0, step=0.1, value=2.5)
+    #                     pt_seed = gr.Number(
+    #                         label="Random Seed", minimum=-1, maximum=2147483647, step=1, value=42)
+    #                 with gr.Accordion("Debug", open=False):
+    #                     pt_mask = gr.Image(
+    #                         label="Generated Mask",
+    #                         width=256,
+    #                         height=256,
+    #                     )
+    #                     pt_densepose = gr.Image(
+    #                         label="Generated DensePose",
+    #                         width=256,
+    #                         height=256,
+    #                     )
+    #             pose_transfer_gen_button.click(
+    #                 fn=leffa_predictor.leffa_predict_pt,
+    #                 inputs=[pt_src_image, pt_ref_image, pt_ref_acceleration, pt_step, pt_scale, pt_seed],
+    #                 outputs=[pt_gen_image, pt_mask, pt_densepose]
+    #             )
 
         gr.Markdown(note)
         demo.launch(share=True, server_port=7860, allowed_paths=["./ckpts/examples"])
