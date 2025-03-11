@@ -9,6 +9,7 @@ from leffa_utils.densepose_predictor import DensePosePredictor
 from leffa_utils.utils import resize_and_center, list_dir, get_agnostic_mask_hd, get_agnostic_mask_dc, preprocess_garment_image
 from preprocess.humanparsing.run_parsing import Parsing
 from preprocess.openpose.run_openpose import OpenPose
+import gradio as gr
 
 # Download checkpoints
 snapshot_download(
@@ -134,42 +135,126 @@ class LeffaPredictor(object):
             preprocess_garment,
         )
 
-if __name__ == "__main__":
-    print("Loading models...")
+# Gradio Interface
+def create_gradio_interface():
     leffa_predictor = LeffaPredictor()
-    print("Models loaded.")
-
-    # Define example directory and get image lists
     example_dir = "./ckpts/examples"
     person1_images = list_dir(f"{example_dir}/person1")
     garment_images = list_dir(f"{example_dir}/garment")
 
-    # Select the first available images
-    src_image_path = person1_images[0]  # Person image
-    ref_image_path = garment_images[1]  # Garment image
+    title = "## Leffa: Learning Flow Fields in Attention for Controllable Person Image Generation"
+    link = """[📚 Paper](https://arxiv.org/abs/2412.08486) - [🤖 Code](https://github.com/franciszzj/Leffa) - [🔥 Demo](https://huggingface.co/spaces/franciszzj/Leffa) - [🤗 Model](https://huggingface.co/franciszzj/Leffa)
+           Star ⭐ us if you like it!"""
+    news = """## News
+            - 09/Jan/2025. Inference defaults to float16, generating an image in 6 seconds (on A100).
+            More news can be found in the [GitHub repository](https://github.com/franciszzj/Leffa)."""
+    description = "Leffa is a unified framework for controllable person image generation that enables precise manipulation of appearance (i.e., virtual try-on)."
+    note = "Note: The model used in this demo is trained solely on the VITON-HD dataset for virtual try-on."
 
-    # Set inference parameters
-    ref_acceleration = False
-    step = 30
-    scale = 2.5
-    seed = 42
-    vt_model_type = "viton_hd"
-    vt_garment_type = "upper_body"
-    vt_repaint = False
-    preprocess_garment = False
+    with gr.Blocks(theme=gr.themes.Default(primary_hue=gr.themes.colors.pink, secondary_hue=gr.themes.colors.red)) as demo:
+        gr.Markdown(title)
+        gr.Markdown(link)
+        gr.Markdown(news)
+        gr.Markdown(description)
 
-    print("Processing images...")
-    print(f"Source image: {src_image_path}")
-    print(f"Reference image: {ref_image_path}")
+        with gr.Row():
+            with gr.Column():
+                gr.Markdown("#### Person Image")
+                vt_src_image = gr.Image(
+                    sources=["upload"],
+                    type="filepath",
+                    label="Person Image",
+                    width=512,
+                    height=512,
+                )
+                gr.Examples(
+                    inputs=vt_src_image,
+                    examples_per_page=10,
+                    examples=person1_images,
+                )
 
-    print("Running inference...")
-    gen_image, mask, densepose = leffa_predictor.leffa_predict_vt(
-        src_image_path, ref_image_path, ref_acceleration, step, scale, seed, vt_model_type, vt_garment_type, vt_repaint, preprocess_garment
-    )
-    print("Inference completed.")
+            with gr.Column():
+                gr.Markdown("#### Garment Image")
+                vt_ref_image = gr.Image(
+                    sources=["upload"],
+                    type="filepath",
+                    label="Garment Image",
+                    width=512,
+                    height=512,
+                )
+                preprocess_garment_checkbox = gr.Checkbox(
+                    label="Preprocess Garment Image (PNG only)",
+                    value=False
+                )
+                gr.Examples(
+                    inputs=vt_ref_image,
+                    examples_per_page=10,
+                    examples=garment_images,
+                )
 
-    print("Saving outputs...")
-    Image.fromarray(gen_image).save("generated_image.png")
-    Image.fromarray(mask).save("mask.png")
-    Image.fromarray(densepose).save("densepose.png")
-    print("Outputs saved.")
+            with gr.Column():
+                gr.Markdown("#### Generated Image")
+                vt_gen_image = gr.Image(
+                    label="Generated Image",
+                    width=512,
+                    height=512,
+                )
+                with gr.Row():
+                    vt_gen_button = gr.Button("Generate")
+                with gr.Accordion("Advanced Options", open=False):
+                    vt_model_type = gr.Radio(
+                        label="Model Type",
+                        choices=[("VITON-HD", "viton_hd")],
+                        value="viton_hd",
+                        interactive=False,  # Fixed to VITON-HD
+                    )
+                    vt_garment_type = gr.Radio(
+                        label="Garment Type",
+                        choices=[("Upper", "upper_body"), ("Lower", "lower_body"), ("Dress", "dresses")],
+                        value="upper_body",
+                    )
+                    vt_ref_acceleration = gr.Radio(
+                        label="Accelerate Reference UNet (may slightly reduce performance)",
+                        choices=[("True", True), ("False", False)],
+                        value=False,
+                    )
+                    vt_repaint = gr.Radio(
+                        label="Repaint Mode",
+                        choices=[("True", True), ("False", False)],
+                        value=False,
+                    )
+                    vt_step = gr.Number(
+                        label="Inference Steps", minimum=30, maximum=100, step=1, value=30)
+                    vt_scale = gr.Number(
+                        label="Guidance Scale", minimum=0.1, maximum=5.0, step=0.1, value=2.5)
+                    vt_seed = gr.Number(
+                        label="Random Seed", minimum=-1, maximum=2147483647, step=1, value=42)
+                with gr.Accordion("Debug", open=False):
+                    vt_mask = gr.Image(
+                        label="Generated Mask",
+                        width=256,
+                        height=256,
+                    )
+                    vt_densepose = gr.Image(
+                        label="Generated DensePose",
+                        width=256,
+                        height=256,
+                    )
+
+        vt_gen_button.click(
+            fn=leffa_predictor.leffa_predict_vt,
+            inputs=[
+                vt_src_image, vt_ref_image, vt_ref_acceleration,
+                vt_step, vt_scale, vt_seed, vt_model_type,
+                vt_garment_type, vt_repaint, preprocess_garment_checkbox
+            ],
+            outputs=[vt_gen_image, vt_mask, vt_densepose]
+        )
+
+        gr.Markdown(note)
+
+    return demo
+
+if __name__ == "__main__":
+    demo = create_gradio_interface()
+    demo.launch(share=True, allowed_paths=["./ckpts/examples"])
