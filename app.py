@@ -146,7 +146,7 @@ if __name__ == "__main__":
 
     # Select the first available images
     src_image_path = person1_images[0]  # Person image
-    ref_image_path = garment_images[0]  # Garment image
+    ref_image_path = garment_images[1]  # Garment image
 
     # Set inference parameters
     ref_acceleration = False
