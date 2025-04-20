@@ -1,4 +1,5 @@
 import numpy as np
+import gradio as gr
 from PIL import Image
 from huggingface_hub import snapshot_download
 from leffa.transform import LeffaTransform
@@ -134,42 +135,99 @@ class LeffaPredictor(object):
             preprocess_garment,
         )
 
-if __name__ == "__main__":
-    print("Loading models...")
-    leffa_predictor = LeffaPredictor()
-    print("Models loaded.")
+def run_virtual_tryon(src_image, ref_image, guidance_scale, num_steps, vt_garment_type, seed, ref_acceleration, vt_repaint, preprocess_garment):
+    """
+    Process uploaded images and run Leffa virtual try-on.
+    
+    Args:
+        src_image (PIL.Image): Source image (person)
+        ref_image (PIL.Image): Reference image (garment)
+        guidance_scale (float): Classifier-free guidance scale
+        num_steps (int): Number of inference steps
+        vt_garment_type (str): Garment type (upper_body, lower_body, full_body)
+        seed (int): Random seed
+        ref_acceleration (bool): Enable reference acceleration
+        vt_repaint (bool): Enable repaint mode
+        preprocess_garment (bool): Preprocess garment image
+    
+    Returns:
+        PIL.Image: Generated virtual try-on image
+    """
+    try:
+        # Initialize predictor
+        leffa_predictor = LeffaPredictor()
+        
+        # Save uploaded images temporarily
+        src_image_path = "temp_src.png"
+        ref_image_path = "temp_ref.png"
+        src_image.save(src_image_path)
+        ref_image.save(ref_image_path)
+        
+        # Set fixed parameters
+        vt_model_type = "viton_hd"
+        
+        # Run inference
+        gen_image, _, _ = leffa_predictor.leffa_predict_vt(
+            src_image_path=src_image_path,
+            ref_image_path=ref_image_path,
+            ref_acceleration=ref_acceleration,
+            step=num_steps,
+            scale=guidance_scale,
+            seed=seed,
+            vt_model_type=vt_model_type,
+            vt_garment_type=vt_garment_type,
+            vt_repaint=vt_repaint,
+            preprocess_garment=preprocess_garment
+        )
+        
+        # Convert output to PIL Image
+        return Image.fromarray(gen_image)
+    
+    except Exception as e:
+        return f"Error: {str(e)}"
 
-    # Define example directory and get image lists
-    example_dir = "./ckpts/examples"
-    person1_images = list_dir(f"{example_dir}/person1")
-    garment_images = list_dir(f"{example_dir}/garment")
-
-    # Select the first available images
-    src_image_path = person1_images[0]  # Person image
-    ref_image_path = garment_images[1]  # Garment image
-
-    # Set inference parameters
-    ref_acceleration = False
-    step = 30
-    scale = 2.5
-    seed = 42
-    vt_model_type = "viton_hd"
-    vt_garment_type = "upper_body"
-    vt_repaint = False
-    preprocess_garment = False
-
-    print("Processing images...")
-    print(f"Source image: {src_image_path}")
-    print(f"Reference image: {ref_image_path}")
-
-    print("Running inference...")
-    gen_image, mask, densepose = leffa_predictor.leffa_predict_vt(
-        src_image_path, ref_image_path, ref_acceleration, step, scale, seed, vt_model_type, vt_garment_type, vt_repaint, preprocess_garment
+# Define Gradio interface
+with gr.Blocks() as demo:
+    gr.Markdown("# Leffa Virtual Try-On")
+    gr.Markdown("Upload a person image and a garment image to see the virtual try-on result.")
+    
+    with gr.Row():
+        with gr.Column():
+            src_image = gr.Image(type="pil", label="Person Image")
+            ref_image = gr.Image(type="pil", label="Garment Image")
+        
+        with gr.Column():
+            guidance_scale = gr.Slider(1.0, 10.0, value=2.5, label="Guidance Scale")
+            num_steps = gr.Slider(10, 50, value=30, step=1, label="Inference Steps")
+            vt_garment_type = gr.Dropdown(
+                choices=["upper_body", "lower_body", "full_body"],
+                value="upper_body",
+                label="Garment Type"
+            )
+            seed = gr.Number(value=42, label="Random Seed")
+            ref_acceleration = gr.Checkbox(label="Reference Acceleration", value=False)
+            vt_repaint = gr.Checkbox(label="Repaint Mode", value=False)
+            preprocess_garment = gr.Checkbox(label="Preprocess Garment", value=False)
+    
+    submit_btn = gr.Button("Generate")
+    output_image = gr.Image(label="Generated Image")
+    
+    submit_btn.click(
+        fn=run_virtual_tryon,
+        inputs=[
+            src_image,
+            ref_image,
+            guidance_scale,
+            num_steps,
+            vt_garment_type,
+            seed,
+            ref_acceleration,
+            vt_repaint,
+            preprocess_garment
+        ],
+        outputs=output_image
     )
-    print("Inference completed.")
 
-    print("Saving outputs...")
-    Image.fromarray(gen_image).save("generated_image.png")
-    Image.fromarray(mask).save("mask.png")
-    Image.fromarray(densepose).save("densepose.png")
-    print("Outputs saved.")
+# Launch the interface
+if __name__ == "__main__":
+    demo.launch(share=False)
