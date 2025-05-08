@@ -154,13 +154,11 @@ if __name__ == "__main__":
 
             More news can be found in the [GitHub repository](https://github.com/franciszzj/Leffa).
             """
-    description = "Leffa is a unified framework for controllable person image generation that enables precise manipulation of both appearance (i.e., virtual try-on) and pose (i.e., pose transfer)."
+    description = "This is virtual-try on project , code reference taken from this repo https://github.com/franciszzj/Leffa"
     note = "Note: The models used in the demo are trained solely on academic datasets. Virtual try-on uses VITON-HD/DressCode, and pose transfer uses DeepFashion."
 
     with gr.Blocks(theme=gr.themes.Default(primary_hue=gr.themes.colors.pink, secondary_hue=gr.themes.colors.red)).queue() as demo:
         gr.Markdown(title)
-        gr.Markdown(link)
-        gr.Markdown(news)
         gr.Markdown(description)
 
         with gr.Tab("Control Appearance (Virtual Try-on)"):
