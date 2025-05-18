@@ -1019,6 +1019,8 @@ class UNet2DConditionModel(ModelMixin, ConfigMixin, UNet2DConditionLoadersMixin)
         # The overall upsampling factor is equal to 2 ** (# num of upsampling layers).
         # However, the upsampling interpolation output size can be forced to fit any upsampling size
         # on the fly if necessary.
+        logger.info("jskfksjhfk")
+        print("scbshcbhcb")
         default_overall_up_factor = 2**self.num_upsamplers
 
         # upsample size should be forwarded when sample is not a multiple of `default_overall_up_factor`
@@ -1283,6 +1285,7 @@ class UNet2DConditionModel(ModelMixin, ConfigMixin, UNet2DConditionLoadersMixin)
                     **additional_residuals,
                 )
                 print('sample' , sample.shape)
+                logger.info('sample-kares',sample.shape)
             else:
                 sample, res_samples = downsample_block(
                     hidden_states=sample, temb=emb, scale=lora_scale
