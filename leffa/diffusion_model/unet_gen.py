@@ -1282,6 +1282,7 @@ class UNet2DConditionModel(ModelMixin, ConfigMixin, UNet2DConditionLoadersMixin)
                     this_reference_feature_idx=this_reference_feature_idx,
                     **additional_residuals,
                 )
+                print('sample' , sample.shape)
             else:
                 sample, res_samples = downsample_block(
                     hidden_states=sample, temb=emb, scale=lora_scale
