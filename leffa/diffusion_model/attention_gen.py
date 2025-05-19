@@ -420,6 +420,7 @@ class BasicTransformerBlock(nn.Module):
 
             if self.pos_embed is not None and self.use_ada_layer_norm_single is False:
                 norm_hidden_states = self.pos_embed(norm_hidden_states)
+            print('encoder_hidden_states in atttention-gen',encoder_hidden_states.shape)
 
             attn_output = self.attn2(
                 norm_hidden_states,

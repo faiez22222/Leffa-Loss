@@ -349,6 +349,7 @@ class Transformer2DModel(ModelMixin, ConfigMixin):
         # this helps to broadcast it as a bias over attention scores, which will be in one of the following shapes:
         #   [batch,  heads, query_tokens, key_tokens] (e.g. torch sdp attn)
         #   [batch * heads, query_tokens, key_tokens] (e.g. xformers or classic attn)
+        print('encoder_hidden_states in Transforemr2DModel',encoder_hidden_states.shape)
         if attention_mask is not None and attention_mask.ndim == 2:
             # assume that mask is expressed as:
             #   (1 = keep,      0 = discard)
