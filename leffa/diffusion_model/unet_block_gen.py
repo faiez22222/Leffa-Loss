@@ -1203,7 +1203,7 @@ class CrossAttnDownBlock2D(nn.Module):
         this_reference_feature_idx=0,
     ) -> Tuple[torch.FloatTensor, Tuple[torch.FloatTensor, ...]]:
         output_states = ()
-
+        print("heyforward me") 
         lora_scale = (
             cross_attention_kwargs.get("scale", 1.0)
             if cross_attention_kwargs is not None
@@ -1269,7 +1269,7 @@ class CrossAttnDownBlock2D(nn.Module):
                 hidden_states = downsampler(hidden_states, scale=lora_scale)
 
             output_states = output_states + (hidden_states,)
-
+        print('hidden_States',hidden_states)
         return hidden_states, output_states, this_reference_feature_idx
 
 
