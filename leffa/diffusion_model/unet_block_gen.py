@@ -1257,7 +1257,7 @@ class CrossAttnDownBlock2D(nn.Module):
                     this_reference_feature_idx=this_reference_feature_idx,
                 )
                 hidden_states = hidden_states[0]
-                print('attention_hidden_states' , hidden_states)
+                print('attention_hidden_states' , hidden_states.shape)
 
             # apply additional residuals to the output of the last pair of resnet and attention blocks
             if i == len(blocks) - 1 and additional_residuals is not None:
