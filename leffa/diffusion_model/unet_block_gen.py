@@ -1203,7 +1203,6 @@ class CrossAttnDownBlock2D(nn.Module):
         this_reference_feature_idx=0,
     ) -> Tuple[torch.FloatTensor, Tuple[torch.FloatTensor, ...]]:
         output_states = ()
-        print("heyforward me") 
         lora_scale = (
             cross_attention_kwargs.get("scale", 1.0)
             if cross_attention_kwargs is not None
@@ -1246,6 +1245,7 @@ class CrossAttnDownBlock2D(nn.Module):
                 hidden_states = hidden_states[0]
             else:
                 hidden_states = resnet(hidden_states, temb, scale=lora_scale)
+                print('resnet_hidden_states',hidden_states.shape)
                 hidden_states, this_reference_feature_idx = attn(
                     hidden_states,
                     encoder_hidden_states=encoder_hidden_states,
@@ -1257,6 +1257,7 @@ class CrossAttnDownBlock2D(nn.Module):
                     this_reference_feature_idx=this_reference_feature_idx,
                 )
                 hidden_states = hidden_states[0]
+                print('attention_hidden_states' , hidden_states)
 
             # apply additional residuals to the output of the last pair of resnet and attention blocks
             if i == len(blocks) - 1 and additional_residuals is not None:
@@ -1269,7 +1270,6 @@ class CrossAttnDownBlock2D(nn.Module):
                 hidden_states = downsampler(hidden_states, scale=lora_scale)
 
             output_states = output_states + (hidden_states,)
-        print('hidden_States',hidden_states.shape)
         return hidden_states, output_states, this_reference_feature_idx
 
 
