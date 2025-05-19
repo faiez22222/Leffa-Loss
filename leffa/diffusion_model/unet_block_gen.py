@@ -1269,7 +1269,7 @@ class CrossAttnDownBlock2D(nn.Module):
                 hidden_states = downsampler(hidden_states, scale=lora_scale)
 
             output_states = output_states + (hidden_states,)
-        print('hidden_States',hidden_states)
+        print('hidden_States',hidden_states.shape)
         return hidden_states, output_states, this_reference_feature_idx
 
 
