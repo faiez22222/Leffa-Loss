@@ -178,6 +178,8 @@ class BasicTransformerBlock(nn.Module):
     ):
         super().__init__()
         self.only_cross_attention = only_cross_attention
+        print("cross_attention_dim",cross_attention_dim)
+        print('dim',dim)
 
         self.use_ada_layer_norm_zero = (
             num_embeds_ada_norm is not None
