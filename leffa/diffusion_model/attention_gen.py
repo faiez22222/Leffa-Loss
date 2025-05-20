@@ -391,8 +391,7 @@ class BasicTransformerBlock(nn.Module):
             attention_mask=attention_mask,
             **cross_attention_kwargs,
         )
-        print('attn_output_0',attn_output.shape)   
-        print('gate_msa',gate_msa.shape) 
+        print('attn_output_0',attn_output.shape)    
         if self.use_ada_layer_norm_zero:
             print('self.use_ada_layer_norm_zero')
             attn_output = gate_msa.unsqueeze(1) * attn_output
