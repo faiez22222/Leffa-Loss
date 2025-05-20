@@ -376,9 +376,12 @@ class BasicTransformerBlock(nn.Module):
         gligen_kwargs = cross_attention_kwargs.pop("gligen", None)
 
         # concat reference features with hidden states
+        print('norm_hidden_states_0',norm_hidden_states.shape)
+        print('reference_features_0',reference_features[this_reference_feature_idx].shape)
         modify_norm_hidden_states = torch.cat(
             [norm_hidden_states, reference_features[this_reference_feature_idx]], dim=1
         )
+        print('modify_norm_hidden_states_0',modify_norm_hidden_states)
         this_reference_feature_idx += 1
         attn_output = self.attn1(
             modify_norm_hidden_states,
@@ -388,13 +391,14 @@ class BasicTransformerBlock(nn.Module):
             attention_mask=attention_mask,
             **cross_attention_kwargs,
         )
+        print('attn_output_0',attn_output.shape)    
         if self.use_ada_layer_norm_zero:
             attn_output = gate_msa.unsqueeze(1) * attn_output
         elif self.use_ada_layer_norm_single:
             attn_output = gate_msa * attn_output
 
-        print('attn_output',attn_output)    
-
+        print('attn_output',attn_output.shape)    
+        print
         hidden_states = attn_output[:,
                                     : hidden_states.shape[-2], :] + hidden_states
         print('hidden_states_after_attn1',hidden_states.shape)
