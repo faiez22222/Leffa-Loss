@@ -421,6 +421,7 @@ class BasicTransformerBlock(nn.Module):
                 norm_hidden_states = self.norm2(hidden_states, timestep)
             elif self.use_ada_layer_norm_zero or self.use_layer_norm:
                 norm_hidden_states = self.norm2(hidden_states)
+                print('norm_hidden_states_in_use_layer_norm' , norm_hidden_states.shape)
             elif self.use_ada_layer_norm_single:
                 # For PixArt norm2 isn't applied here:
                 # https://github.com/PixArt-alpha/PixArt-alpha/blob/0f55e922376d8b797edd44d25d0e7464b260dcab/diffusion/model/nets/PixArtMS.py#L70C1-L76C103
