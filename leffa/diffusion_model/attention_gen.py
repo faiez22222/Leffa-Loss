@@ -381,7 +381,7 @@ class BasicTransformerBlock(nn.Module):
         modify_norm_hidden_states = torch.cat(
             [norm_hidden_states, reference_features[this_reference_feature_idx]], dim=1
         )
-        print('modify_norm_hidden_states_0',modify_norm_hidden_states)
+        print('modify_norm_hidden_states_0',modify_norm_hidden_states.shape)
         this_reference_feature_idx += 1
         attn_output = self.attn1(
             modify_norm_hidden_states,
@@ -391,10 +391,13 @@ class BasicTransformerBlock(nn.Module):
             attention_mask=attention_mask,
             **cross_attention_kwargs,
         )
-        print('attn_output_0',attn_output.shape)    
+        print('attn_output_0',attn_output.shape)   
+        print('gate_msa',gate_msa.shape) 
         if self.use_ada_layer_norm_zero:
+            print('self.use_ada_layer_norm_zero')
             attn_output = gate_msa.unsqueeze(1) * attn_output
         elif self.use_ada_layer_norm_single:
+            print("self.use_ada_layer_norm_single")
             attn_output = gate_msa * attn_output
 
         print('attn_output',attn_output.shape)    
