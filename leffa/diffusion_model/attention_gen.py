@@ -393,8 +393,11 @@ class BasicTransformerBlock(nn.Module):
         elif self.use_ada_layer_norm_single:
             attn_output = gate_msa * attn_output
 
+        print('attn_output',attn_output)    
+
         hidden_states = attn_output[:,
                                     : hidden_states.shape[-2], :] + hidden_states
+        print('hidden_states_after_attn1',hidden_states.shape)
 
         if hidden_states.ndim == 4:
             hidden_states = hidden_states.squeeze(1)
