@@ -405,7 +405,10 @@ class BasicTransformerBlock(nn.Module):
 
         # 3. Cross-Attention
         if self.attn2 is not None:
+            print('hidden_states for attn2',hidden_states.shape)
+            print('timestep in attn2',timestep.shape)
             if self.use_ada_layer_norm:
+                print('use_ada_layer_norm')
                 norm_hidden_states = self.norm2(hidden_states, timestep)
             elif self.use_ada_layer_norm_zero or self.use_layer_norm:
                 norm_hidden_states = self.norm2(hidden_states)
@@ -421,8 +424,8 @@ class BasicTransformerBlock(nn.Module):
                 raise ValueError("Incorrect norm")
 
             if self.pos_embed is not None and self.use_ada_layer_norm_single is False:
+                print('pos_embed')
                 norm_hidden_states = self.pos_embed(norm_hidden_states)
-            print('encoder_hidden_states in atttention-gen',encoder_hidden_states)
             print('norm_hidden_states',norm_hidden_states.shape)
 
             attn_output = self.attn2(
