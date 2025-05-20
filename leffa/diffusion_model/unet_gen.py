@@ -784,10 +784,12 @@ class UNet2DConditionModel(ModelMixin, ConfigMixin, UNet2DConditionLoadersMixin)
             for proc in self.attn_processors.values()
         ):
             processor = AttnAddedKVProcessor()
+            print("AttnAddedKVProcessor")
         elif all(
             proc.__class__ in CROSS_ATTENTION_PROCESSORS
             for proc in self.attn_processors.values()
         ):
+            "AttnAddedKVProcessor"
             processor = AttnProcessor()
         else:
             raise ValueError(
