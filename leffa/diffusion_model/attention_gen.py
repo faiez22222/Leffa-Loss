@@ -406,7 +406,7 @@ class BasicTransformerBlock(nn.Module):
         # 3. Cross-Attention
         if self.attn2 is not None:
             print('hidden_states for attn2',hidden_states.shape)
-            print('timestep in attn2',timestep.shape)
+            print('timestep in attn2',timestep)
             if self.use_ada_layer_norm:
                 print('use_ada_layer_norm')
                 norm_hidden_states = self.norm2(hidden_states, timestep)
