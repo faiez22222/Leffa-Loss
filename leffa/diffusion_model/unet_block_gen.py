@@ -933,7 +933,8 @@ class UNetMidBlock2DSimpleCrossAttn(nn.Module):
             cross_attention_kwargs if cross_attention_kwargs is not None else {}
         )
         lora_scale = cross_attention_kwargs.get("scale", 1.0)
-
+        print('hidden_states',hidden_states.shape) 
+        print('encoder_hidden_states',encoder_hidden_states.shape)  
         if attention_mask is None:
             # if encoder_hidden_states is defined: we are doing cross-attn, so we should use cross-attn mask.
             mask = None if encoder_hidden_states is None else encoder_attention_mask
