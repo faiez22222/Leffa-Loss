@@ -178,8 +178,6 @@ class BasicTransformerBlock(nn.Module):
     ):
         super().__init__()
         self.only_cross_attention = only_cross_attention
-        print("cross_attention_dim",cross_attention_dim)
-        print('dim',dim)
 
         self.use_ada_layer_norm_zero = (
             num_embeds_ada_norm is not None
@@ -376,12 +374,10 @@ class BasicTransformerBlock(nn.Module):
         gligen_kwargs = cross_attention_kwargs.pop("gligen", None)
 
         # concat reference features with hidden states
-        print('norm_hidden_states_0',norm_hidden_states.shape)
-        print('reference_features_0',reference_features[this_reference_feature_idx].shape)
         modify_norm_hidden_states = torch.cat(
             [norm_hidden_states, reference_features[this_reference_feature_idx]], dim=1
         )
-        print('modify_norm_hidden_states_0',modify_norm_hidden_states.shape)
+
         this_reference_feature_idx += 1
         attn_output = self.attn1(
             modify_norm_hidden_states,
@@ -391,18 +387,14 @@ class BasicTransformerBlock(nn.Module):
             attention_mask=attention_mask,
             **cross_attention_kwargs,
         )
-        print('attn_output_0',attn_output.shape)    
+
         if self.use_ada_layer_norm_zero:
-            print('self.use_ada_layer_norm_zero')
             attn_output = gate_msa.unsqueeze(1) * attn_output
         elif self.use_ada_layer_norm_single:
-            print("self.use_ada_layer_norm_single")
             attn_output = gate_msa * attn_output
 
-        print('attn_output',attn_output.shape)    
         hidden_states = attn_output[:,
                                     : hidden_states.shape[-2], :] + hidden_states
-        print('hidden_states_after_attn1',hidden_states.shape)
 
         if hidden_states.ndim == 4:
             print("4")
@@ -414,14 +406,10 @@ class BasicTransformerBlock(nn.Module):
 
         # 3. Cross-Attention
         if self.attn2 is not None:
-            print('hidden_states for attn2',hidden_states.shape)
-            print('timestep in attn2',timestep)
             if self.use_ada_layer_norm:
-                print('use_ada_layer_norm')
                 norm_hidden_states = self.norm2(hidden_states, timestep)
             elif self.use_ada_layer_norm_zero or self.use_layer_norm:
                 norm_hidden_states = self.norm2(hidden_states)
-                print('norm_hidden_states_in_use_layer_norm' , norm_hidden_states.shape)
             elif self.use_ada_layer_norm_single:
                 # For PixArt norm2 isn't applied here:
                 # https://github.com/PixArt-alpha/PixArt-alpha/blob/0f55e922376d8b797edd44d25d0e7464b260dcab/diffusion/model/nets/PixArtMS.py#L70C1-L76C103
@@ -434,9 +422,7 @@ class BasicTransformerBlock(nn.Module):
                 raise ValueError("Incorrect norm")
 
             if self.pos_embed is not None and self.use_ada_layer_norm_single is False:
-                print('pos_embed')
                 norm_hidden_states = self.pos_embed(norm_hidden_states)
-            print('norm_hidden_states',norm_hidden_states.shape)
 
             attn_output = self.attn2(
                 norm_hidden_states,
