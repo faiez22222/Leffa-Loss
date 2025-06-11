@@ -779,8 +779,6 @@ class UNetMidBlock2DCrossAttn(nn.Module):
             if cross_attention_kwargs is not None
             else 1.0
         )
-        print('hidden state' , hidden_states.shape)
-        print('encoder_hidden_states',encoder_hidden_states.shape)
         hidden_states = self.resnets[0](hidden_states, temb, scale=lora_scale)
         for attn, resnet in zip(self.attentions, self.resnets[1:]):
             if self.training and self.gradient_checkpointing:
@@ -1248,6 +1246,7 @@ class CrossAttnDownBlock2D(nn.Module):
                 hidden_states = hidden_states[0]
             else:
                 hidden_states = resnet(hidden_states, temb, scale=lora_scale)
+                print('resnet_hidden_states',hidden_states.shape)
                 hidden_states, this_reference_feature_idx = attn(
                     hidden_states,
                     encoder_hidden_states=encoder_hidden_states,
@@ -1259,6 +1258,7 @@ class CrossAttnDownBlock2D(nn.Module):
                     this_reference_feature_idx=this_reference_feature_idx,
                 )
                 hidden_states = hidden_states[0]
+                print('attention_hidden_states' , hidden_states.shape)
 
             # apply additional residuals to the output of the last pair of resnet and attention blocks
             if i == len(blocks) - 1 and additional_residuals is not None:
