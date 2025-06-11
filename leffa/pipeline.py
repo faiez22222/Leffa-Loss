@@ -49,7 +49,7 @@ class LeffaPipeline(object):
         mask,
         densepose,
         ref_acceleration=False,
-        num_inference_steps=1,
+        num_inference_steps=30,
         do_classifier_free_guidance=True,
         guidance_scale=2.5,
         generator=None,
