@@ -1245,7 +1245,6 @@ class CrossAttnDownBlock2D(nn.Module):
                 hidden_states = hidden_states[0]
             else:
                 hidden_states = resnet(hidden_states, temb, scale=lora_scale)
-                print('resnet_hidden_states',hidden_states.shape)
                 hidden_states, this_reference_feature_idx = attn(
                     hidden_states,
                     encoder_hidden_states=encoder_hidden_states,
@@ -1257,7 +1256,6 @@ class CrossAttnDownBlock2D(nn.Module):
                     this_reference_feature_idx=this_reference_feature_idx,
                 )
                 hidden_states = hidden_states[0]
-                print('attention_hidden_states' , hidden_states.shape)
 
             # apply additional residuals to the output of the last pair of resnet and attention blocks
             if i == len(blocks) - 1 and additional_residuals is not None:

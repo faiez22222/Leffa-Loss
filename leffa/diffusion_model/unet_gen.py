@@ -784,7 +784,6 @@ class UNet2DConditionModel(ModelMixin, ConfigMixin, UNet2DConditionLoadersMixin)
             for proc in self.attn_processors.values()
         ):
             processor = AttnAddedKVProcessor()
-            print("AttnAddedKVProcessor")
         elif all(
             proc.__class__ in CROSS_ATTENTION_PROCESSORS
             for proc in self.attn_processors.values()
@@ -1022,7 +1021,6 @@ class UNet2DConditionModel(ModelMixin, ConfigMixin, UNet2DConditionLoadersMixin)
         # However, the upsampling interpolation output size can be forced to fit any upsampling size
         # on the fly if necessary.
         logger.info("jskfksjhfk")
-        print("scbshcbhcb")
         default_overall_up_factor = 2**self.num_upsamplers
 
         # upsample size should be forwarded when sample is not a multiple of `default_overall_up_factor`
@@ -1286,7 +1284,6 @@ class UNet2DConditionModel(ModelMixin, ConfigMixin, UNet2DConditionLoadersMixin)
                     this_reference_feature_idx=this_reference_feature_idx,
                     **additional_residuals,
                 )
-                print('sample' , sample.shape)
                 logger.info('sample-kares',sample.shape)
             else:
                 sample, res_samples = downsample_block(
