@@ -34,7 +34,7 @@ class LeffaInference(object):
         data = self.to_gpu(data)
 
         ref_acceleration = kwargs.get("ref_acceleration", False)
-        num_inference_steps = 1
+        num_inference_steps = 30
         guidance_scale = kwargs.get("guidance_scale", 2.5)
         seed = kwargs.get("seed", 42)
         repaint = kwargs.get("repaint", False)
